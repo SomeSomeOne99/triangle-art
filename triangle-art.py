@@ -1,4 +1,16 @@
 import pygame
+from tkinter import filedialog
+def load_file():
+    file_name = filedialog.askopenfilename(filetypes = [("Triangle Art Files", "*.tri")])
+    if file_name != "":
+        global triangles
+        with open(file_name, "r") as file:
+            triangles = [[[tuple([int(colour) for colour in triangle.split(",")]) for triangle in triangleset.split(";")] for triangleset in row.split("|")[:-1]] for row in file.read().split("\n")[:-1]]
+def save_file():
+    file_name = filedialog.asksaveasfilename(defaultextension = ".tri", filetypes = [("Triangle Art Files", "*.tri")])
+    if file_name != "":    
+        with open(file_name, "w") as file:
+            file.write("".join(["".join(["".join(["".join([str(colour) + "," for colour in triangle])[:-1] + ";" for triangle in triangleset])[:-1] + "|" for triangleset in row]) + "\n" for row in triangles]))
 class ColourButton():
     def __init__(self, position, colour):
         self.rect = pygame.Rect(position[0], position[1], 50, 50)
@@ -62,7 +74,7 @@ running = True
 scale = 50
 triangles = [[[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(50)] for _ in range(50)]
 colour_buttons = (ColourButton((10, 10), (0,0,0)), ColourButton((65, 10), (150,150,150)), ColourButton((120, 10), (255,255,255)))
-canvas_buttons = (TextButton((10, 65), "Reset", 54, reset_canvas), TextButton((10, 95), "Toggle outlines", 136, toggle_outlines), TextButton((10, 125), "Cycle mode", 108, cycle_mode), TextButton((10, SCREEN_HEIGHT - 30), "Zoom +", 70, lambda : change_scale(2)), TextButton((85, SCREEN_HEIGHT - 30), "Zoom -", 68, lambda : change_scale(-2)))
+canvas_buttons = (TextButton((10, 65), "Reset", 54, reset_canvas), TextButton((10, 95), "Toggle outlines", 136, toggle_outlines), TextButton((10, 125), "Cycle mode", 108, cycle_mode), TextButton((10, SCREEN_HEIGHT - 30), "Zoom +", 70, lambda : change_scale(2)), TextButton((85, SCREEN_HEIGHT - 30), "Zoom -", 68, lambda : change_scale(-2)), TextButton((SCREEN_WIDTH - 61, 10), "Load", 51, load_file), TextButton((SCREEN_WIDTH - 61, 40), "Save", 51, save_file))
 position = [0, 0] # Camera position
 show_outlines = True
 selected_colour = (150,150,150)
