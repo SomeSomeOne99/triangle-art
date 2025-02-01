@@ -7,6 +7,31 @@ class ColourButton():
         pygame.draw.rect(screen, self.colour, self.rect)
     def check_click(self, mouse_pos):
         return self.rect.collidepoint(mouse_pos)
+class TextButton():
+    def __init__(self, position, text, width, command = None):
+        self.rect = pygame.Rect(position[0], position[1], width, 25)
+        self.text = text
+        self.command = command
+    def draw(self, screen):
+        pygame.draw.rect(screen, (200,200,200), self.rect)
+        pygame.draw.rect(screen, (100,100,100), self.rect, width = 2)
+        font = pygame.font.Font(None, 25)
+        text = font.render(self.text, True, (0,0,0,0))
+        text_rect = text.get_rect(left = self.rect.left + 5, centery = self.rect.centery)
+        screen.blit(text, text_rect)
+    def check_click(self, mouse_pos):
+        return self.rect.collidepoint(mouse_pos)
+def reset_canvas():
+    global triangles
+    triangles = [[[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(len(triangles[y]))] for y in range(len(triangles))]
+def toggle_outlines():
+    global show_outlines
+    show_outlines = not show_outlines
+def cycle_mode():
+    global triangle_mode
+    triangle_mode += 1
+    if triangle_mode > 3:
+        triangle_mode = 0
 def position_to_triangle(mouse_pos):
     mouse_pos = [mouse_pos[0] + position[0], mouse_pos[1] + position[1]]
     triangles_y = int(mouse_pos[1] // scale)
@@ -30,6 +55,7 @@ running = True
 scale = 50
 triangles = [[[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(50)] for _ in range(50)]
 colour_buttons = (ColourButton((10, 10), (0,0,0)), ColourButton((65, 10), (150,150,150)), ColourButton((120, 10), (255,255,255)))
+canvas_buttons = (TextButton((10, 65), "Reset", 54, reset_canvas), TextButton((10, 95), "Toggle outlines", 136, toggle_outlines), TextButton((10, 125), "Cycle mode", 108, cycle_mode))
 position = [0, 0] # Camera position
 show_outlines = True
 selected_colour = (150,150,150)
@@ -46,6 +72,10 @@ while running:
                     if colour_button.check_click(pygame.mouse.get_pos()):
                         button_selected = True
                         selected_colour = colour_button.colour
+                for canvas_button in canvas_buttons:
+                    if canvas_button.check_click(pygame.mouse.get_pos()):
+                        button_selected = True
+                        canvas_button.command()
                 if not button_selected:
                     triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
                     for i in triangles_i:
@@ -57,15 +87,6 @@ while running:
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1: # Left click
                 target_code = None
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_DELETE or event.key == pygame.K_KP_PERIOD: # Reset
-                triangles = [[[0, 0, 0, 0] for _ in range(len(triangles[y]))] for y in range(len(triangles))]
-            elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER: # Toggle outlines
-                show_outlines = not show_outlines
-            elif event.key == pygame.K_TAB or event.key == pygame.K_KP_DIVIDE: # Toggle outlines
-                triangle_mode += 1
-                if triangle_mode > 3:
-                    triangle_mode = 0
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_PLUS] or keys_pressed[pygame.K_KP_PLUS]: # Increase scale
             prev_y = position[1] / scale
@@ -133,5 +154,7 @@ while running:
             pygame.draw.rect(screen, (75,200,75), colour_button.rect, width = 2)
         else:
             pygame.draw.rect(screen, (200,200,200) if colour_button.check_click(pygame.mouse.get_pos()) else (100,100,100), colour_button.rect, width = 2)
+    for canvas_button in canvas_buttons:
+        canvas_button.draw(screen)
     pygame.display.flip() # Update screen
     clock.tick(FPS) # Wait for next frame
