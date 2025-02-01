@@ -156,5 +156,7 @@ while running:
             pygame.draw.rect(screen, (200,200,200) if colour_button.check_click(pygame.mouse.get_pos()) else (100,100,100), colour_button.rect, width = 2)
     for canvas_button in canvas_buttons:
         canvas_button.draw(screen)
+        if canvas_button.check_click(pygame.mouse.get_pos()):
+            pygame.draw.rect(screen, (200,200,200), canvas_button.rect, width = 2)
     pygame.display.flip() # Update screen
     clock.tick(FPS) # Wait for next frame
