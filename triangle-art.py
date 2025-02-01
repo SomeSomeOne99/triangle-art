@@ -32,6 +32,13 @@ def cycle_mode():
     triangle_mode += 1
     if triangle_mode > 3:
         triangle_mode = 0
+def change_scale(change):
+    global scale
+    prev_y = position[1] / scale
+    prev_x = position[0] / scale
+    scale += change
+    position[1] = prev_y * scale
+    position[0] = prev_x * scale
 def position_to_triangle(mouse_pos):
     mouse_pos = [mouse_pos[0] + position[0], mouse_pos[1] + position[1]]
     triangles_y = int(mouse_pos[1] // scale)
@@ -55,7 +62,7 @@ running = True
 scale = 50
 triangles = [[[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(50)] for _ in range(50)]
 colour_buttons = (ColourButton((10, 10), (0,0,0)), ColourButton((65, 10), (150,150,150)), ColourButton((120, 10), (255,255,255)))
-canvas_buttons = (TextButton((10, 65), "Reset", 54, reset_canvas), TextButton((10, 95), "Toggle outlines", 136, toggle_outlines), TextButton((10, 125), "Cycle mode", 108, cycle_mode))
+canvas_buttons = (TextButton((10, 65), "Reset", 54, reset_canvas), TextButton((10, 95), "Toggle outlines", 136, toggle_outlines), TextButton((10, 125), "Cycle mode", 108, cycle_mode), TextButton((10, SCREEN_HEIGHT - 30), "Zoom +", 70, lambda : change_scale(2)), TextButton((85, SCREEN_HEIGHT - 30), "Zoom -", 68, lambda : change_scale(-2)))
 position = [0, 0] # Camera position
 show_outlines = True
 selected_colour = (150,150,150)
@@ -89,17 +96,9 @@ while running:
                 target_code = None
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_PLUS] or keys_pressed[pygame.K_KP_PLUS]: # Increase scale
-            prev_y = position[1] / scale
-            prev_x = position[0] / scale
-            scale += 2
-            position[1] = prev_y * scale
-            position[0] = prev_x * scale
+            change_scale(2)
         elif (keys_pressed[pygame.K_MINUS] or keys_pressed[pygame.K_KP_MINUS]) and scale > 2: # Decrease scale
-            prev_y = position[1] / scale
-            prev_x = position[0] / scale
-            scale -= 2
-            position[1] = prev_y * scale
-            position[0] = prev_x * scale
+            change_scale(-2)
         if keys_pressed[pygame.K_w]:
             position[1] -= scale / (2 if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT] else 10)
         if keys_pressed[pygame.K_s]:
