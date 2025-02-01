@@ -2,10 +2,10 @@
 A small pygame-based triangle art creation software written in Python
 ## Roadmap
 
-- [ ] UI update
-  - [ ] Buttons for triangle mode
-  - [ ] Buttons for colour selection
-  - [ ] Buttons for canvas reset and zoom control
+- [X] UI update
+  - [X] Buttons for triangle mode
+  - [x] Buttons for colour selection
+  - [X] Buttons for canvas reset and zoom control
 - [ ] File export
   - [ ] Custom .tri format
   - [ ] Bitmap (.bmp) format
