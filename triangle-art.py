@@ -1,0 +1,115 @@
+import pygame
+def position_to_triangle(mouse_pos):
+    mouse_pos = [mouse_pos[0] + position[0], mouse_pos[1] + position[1]]
+    triangles_y = int(mouse_pos[1] // scale)
+    triangles_x = int(mouse_pos[0] // scale)
+    triangle_side = (mouse_pos[1] - triangles_y*scale) + (mouse_pos[0] - triangles_x*scale) > scale
+    if triangle_mode == 0:
+        triangles_i = ([2] if triangle_side else [3]) if (mouse_pos[1] - triangles_y*scale) > (mouse_pos[0] - triangles_x*scale) else ([1] if triangle_side else [0])
+    elif triangle_mode == 1:
+        triangles_i = (1, 2) if triangle_side else (0, 3)
+    elif triangle_mode == 2:
+        triangles_i = (2, 3) if (mouse_pos[1] - triangles_y*scale) > (mouse_pos[0] - triangles_x*scale) else (0, 1)
+    return triangles_y, triangles_x, triangles_i
+pygame.init()
+SCREEN_WIDTH, SCREEN_HEIGHT = 500, 500
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+clock = pygame.time.Clock()
+FPS = 30
+running = True
+scale = 50
+triangles = [[[0, 0, 0, 0] for _ in range(50)] for _ in range(50)]
+colours = {0: (0,0,0), 1: (150,150,150), 2: (255,255,255)} # Possible triangle colours
+position = [0, 0] # Camera position
+show_outlines = True
+target_code = None
+triangle_mode = 0 # 0 = quarter triangle, 1 = half triangle top-right/bottom-left, 2 = half triangle top-left/bottom-right
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1: # Left click
+                triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
+                for i in triangles_i:
+                    triangles[triangles_y][triangles_x][i] += 1
+                    if triangles[triangles_y][triangles_x][i] > 2:
+                        triangles[triangles_y][triangles_x][i] = 0
+                    target_code = triangles[triangles_y][triangles_x][i]
+            elif event.button == 3: # Right click
+                triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
+                for i in triangles_i:
+                    triangles[triangles_y][triangles_x][i] = 0
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1: # Left click
+                target_code = None
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_DELETE or event.key == pygame.K_KP_PERIOD: # Reset
+                triangles = [[[0, 0, 0, 0] for _ in range(len(triangles[y]))] for y in range(len(triangles))]
+            elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER: # Toggle outlines
+                show_outlines = not show_outlines
+            elif event.key == pygame.K_TAB or event.key == pygame.K_KP_DIVIDE: # Toggle outlines
+                triangle_mode += 1
+                if triangle_mode > 2:
+                    triangle_mode = 0
+        keys_pressed = pygame.key.get_pressed()
+        if keys_pressed[pygame.K_PLUS] or keys_pressed[pygame.K_KP_PLUS]: # Increase scale
+            prev_y = position[1] / scale
+            prev_x = position[0] / scale
+            scale += 2
+            position[1] = prev_y * scale
+            position[0] = prev_x * scale
+        elif (keys_pressed[pygame.K_MINUS] or keys_pressed[pygame.K_KP_MINUS]) and scale > 2: # Decrease scale
+            prev_y = position[1] / scale
+            prev_x = position[0] / scale
+            scale -= 2
+            position[1] = prev_y * scale
+            position[0] = prev_x * scale
+        if keys_pressed[pygame.K_w]:
+            position[1] -= scale / (2 if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT] else 10)
+        if keys_pressed[pygame.K_s]:
+            position[1] += scale / (2 if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT] else 10)
+        if keys_pressed[pygame.K_a]:
+            position[0] -= scale / (2 if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT] else 10)
+        if keys_pressed[pygame.K_d]:
+            position[0] += scale / (2 if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT] else 10)
+        if pygame.mouse.get_pressed()[0] or pygame.mouse.get_pressed()[2]: # Left or right click
+            triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
+            if pygame.mouse.get_pressed()[0] and target_code != None:
+                for i in triangles_i:
+                    triangles[triangles_y][triangles_x][i] = target_code # Set triangle to same colour as clicked
+            elif pygame.mouse.get_pressed()[2]: # Right click
+                for i in triangles_i:
+                    triangles[triangles_y][triangles_x][i] = 0 # Clear triangle
+        while position[0] < 0: # Add more triangles to the left
+            position[0] += scale
+            for row in triangles:
+                row.insert(0, [0, 0, 0, 0])
+        while position[1] < 0: # Add more triangles to the top
+            position[1] += scale
+            triangles.insert(0, [[0, 0, 0, 0] for _ in range(len(triangles[0]))])
+        while (position[0] + SCREEN_WIDTH) // scale >= len(triangles[0]): # Add more triangles to the right
+            for row in triangles:
+                row.append([0, 0, 0, 0])
+        while (position[1] + SCREEN_HEIGHT) // scale >= len(triangles): # Add more triangles to the bottom
+            triangles.append([[0, 0, 0, 0] for _ in range(len(triangles[0]))])
+    screen.fill((0, 0, 0)) # Reset screen
+    for y in range(int(position[1] // scale), int((position[1] + SCREEN_HEIGHT) // scale) + 1):
+        for x in range(int(position[0] // scale), int((position[0] + SCREEN_WIDTH) // scale) + 1):
+            if show_outlines and (triangles[y][x][0] == 0 or triangles[y][x][1] == 0 or triangles[y][x][2] == 0 or triangles[y][x][3] == 0):
+                if triangle_mode == 0 or triangle_mode == 2:
+                    pygame.draw.polygon(screen, (50,50,50), [(x*scale - position[0], y*scale - position[1]), (x*scale - position[0], y*scale+scale - position[1]), (x*scale+scale - position[0], y*scale+scale - position[1])], width = 1)
+                if triangle_mode == 0 or triangle_mode == 1:
+                    pygame.draw.polygon(screen, (50,50,50), [(x*scale+scale - position[0], y*scale - position[1]), (x*scale+scale - position[0], y*scale+scale - position[1]), (x*scale - position[0], y*scale+scale - position[1])], width = 1)
+    for y in range(int(position[1] // scale), int((position[1] + SCREEN_HEIGHT) // scale) + 1):
+        for x in range(int(position[0] // scale), int((position[0] + SCREEN_WIDTH) // scale) + 1):
+            if triangles[y][x][0] != 0:
+                pygame.draw.polygon(screen, colours[triangles[y][x][0]], [(x*scale - position[0], y*scale - position[1]), (x*scale+(scale/2) - position[0], y*scale+(scale/2) - position[1]), (x*scale+scale - position[0], y*scale - position[1])])
+            if triangles[y][x][1] != 0:
+                pygame.draw.polygon(screen, colours[triangles[y][x][1]], [(x*scale+scale - position[0], y*scale - position[1]), (x*scale+(scale/2) - position[0], y*scale+(scale/2) - position[1]), (x*scale+scale - position[0], y*scale+scale - position[1])])
+            if triangles[y][x][2] != 0:
+                pygame.draw.polygon(screen, colours[triangles[y][x][2]], [(x*scale - position[0], y*scale+scale - position[1]), (x*scale+(scale/2) - position[0], y*scale+(scale/2) - position[1]), (x*scale+scale - position[0], y*scale+scale - position[1])])
+            if triangles[y][x][3] != 0:
+                pygame.draw.polygon(screen, colours[triangles[y][x][3]], [(x*scale - position[0], y*scale - position[1]), (x*scale+(scale/2) - position[0], y*scale+(scale/2) - position[1]), (x*scale - position[0], y*scale+scale - position[1])])
+    pygame.display.flip() # Update screen
+    clock.tick(FPS) # Wait for next frame
