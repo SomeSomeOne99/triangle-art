@@ -3,6 +3,8 @@ def position_to_triangle(mouse_pos):
     mouse_pos = [mouse_pos[0] + position[0], mouse_pos[1] + position[1]]
     triangles_y = int(mouse_pos[1] // scale)
     triangles_x = int(mouse_pos[0] // scale)
+    if triangle_mode == 3:
+        return triangles_y, triangles_x, (0, 1, 2, 3)
     triangle_side = (mouse_pos[1] - triangles_y*scale) + (mouse_pos[0] - triangles_x*scale) > scale
     if triangle_mode == 0:
         triangles_i = ([2] if triangle_side else [3]) if (mouse_pos[1] - triangles_y*scale) > (mouse_pos[0] - triangles_x*scale) else ([1] if triangle_side else [0])
@@ -23,7 +25,7 @@ colours = {0: (0,0,0), 1: (150,150,150), 2: (255,255,255)} # Possible triangle c
 position = [0, 0] # Camera position
 show_outlines = True
 target_code = None
-triangle_mode = 0 # 0 = quarter triangle, 1 = half triangle top-right/bottom-left, 2 = half triangle top-left/bottom-right
+triangle_mode = 0 # 0 = quarter triangle, 1 = half triangle top-right/bottom-left, 2 = half triangle top-left/bottom-right, 3 = squares
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -50,7 +52,7 @@ while running:
                 show_outlines = not show_outlines
             elif event.key == pygame.K_TAB or event.key == pygame.K_KP_DIVIDE: # Toggle outlines
                 triangle_mode += 1
-                if triangle_mode > 2:
+                if triangle_mode > 3:
                     triangle_mode = 0
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_PLUS] or keys_pressed[pygame.K_KP_PLUS]: # Increase scale
@@ -97,6 +99,8 @@ while running:
     for y in range(int(position[1] // scale), int((position[1] + SCREEN_HEIGHT) // scale) + 1):
         for x in range(int(position[0] // scale), int((position[0] + SCREEN_WIDTH) // scale) + 1):
             if show_outlines and (triangles[y][x][0] == 0 or triangles[y][x][1] == 0 or triangles[y][x][2] == 0 or triangles[y][x][3] == 0):
+                if triangle_mode == 3:
+                    pygame.draw.rect(screen, (50,50,50), (x*scale - position[0], y*scale - position[1], scale, scale), width = 1)
                 if triangle_mode == 0 or triangle_mode == 2:
                     pygame.draw.polygon(screen, (50,50,50), [(x*scale - position[0], y*scale - position[1]), (x*scale - position[0], y*scale+scale - position[1]), (x*scale+scale - position[0], y*scale+scale - position[1])], width = 1)
                 if triangle_mode == 0 or triangle_mode == 1:
