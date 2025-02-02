@@ -49,6 +49,31 @@ class TextButton(Button):
         screen.blit(text, text_rect)
         if self.check_click(mouse_pos):
             pygame.draw.rect(screen, (200,200,200), canvas_button.rect, width = 2)
+class IconButton():
+    def __init__(self, position, width, height, icon_command = None, command = None, icon_offset = (0, 0)):
+        self.rect = pygame.Rect(position[0], position[1], width, height)
+        self.icon_command = icon_command
+        self.command = command
+        self.icon_position = (position[0] + icon_offset[0], position[1] + icon_offset[1])
+    def draw(self, screen, mouse_pos):
+        pygame.draw.rect(screen, (200,200,200), self.rect)
+        pygame.draw.rect(screen, (100,100,100), self.rect, width = 2)
+        if self.check_click(mouse_pos):
+            pygame.draw.rect(screen, (200,200,200), canvas_button.rect, width = 2)
+        self.icon_command(screen, self.icon_position) # Draw button icon
+    def check_click(self, mouse_pos):
+        return self.rect.collidepoint(mouse_pos)
+# Icon drawing functions
+def draw_quarter_triangles_icon(screen, position):
+    draw_half_triangles1_icon(screen, position) # Quarter triangles are composed of both half triangles
+    draw_half_triangles2_icon(screen, position)
+def draw_half_triangles1_icon(screen, position):
+    pygame.draw.polygon(screen, (50,50,50), [(position[0], position[1]), (position[0], position[1] + 30), (position[0] + 30, position[1])], width = 1)
+def draw_half_triangles2_icon(screen, position):
+    pygame.draw.polygon(screen, (50,50,50), [(position[0], position[1]), (position[0], position[1] + 30), (position[0] + 30, position[1] + 30)], width = 1)
+def draw_squares_icon(screen, position):
+    pygame.draw.rect(screen, (50,50,50), (position[0], position[1], 30, 30), width = 1)
+# Button command functions
 def set_colour(i):
     global colour_buttons, selected_colour
     chosen_colour = colorchooser.askcolor(colour_buttons[i].colour)[0]
@@ -62,11 +87,9 @@ def reset_canvas():
 def toggle_outlines():
     global show_outlines
     show_outlines = not show_outlines
-def cycle_mode():
+def change_mode(mode):
     global triangle_mode
-    triangle_mode += 1
-    if triangle_mode > 3:
-        triangle_mode = 0
+    triangle_mode = mode
 def change_scale(change):
     global scale
     prev_y = position[1] / scale
@@ -74,6 +97,7 @@ def change_scale(change):
     scale += change
     position[1] = prev_y * scale
     position[0] = prev_x * scale
+# Calculation functions
 def position_to_triangle(mouse_pos):
     mouse_pos = [mouse_pos[0] + position[0], mouse_pos[1] + position[1]]
     triangles_y = int(mouse_pos[1] // scale)
@@ -97,7 +121,12 @@ running = True
 scale = 50
 triangles = [[[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(50)] for _ in range(50)]
 colour_buttons = (ColourButton((10, 10), (0,0,0)), ColourButton((65, 10), (150,150,150)), ColourButton((120, 10), (255,255,255)), ColourButton((175, 10), (255,0,0)), ColourButton((230, 10), (0,255,0)), ColourButton((285, 10), (0,0,255)))
-canvas_buttons = tuple([TextButton((22 + 55*i, 45), "Select", width = 38, height = 15, command = partial(set_colour, i), text_size = 15, text_offset = 3) for i in range(6)]) + (TextButton((10, 65), "Reset", 54, command = reset_canvas), TextButton((10, 95), "Toggle outlines", 136, command = toggle_outlines), TextButton((10, 125), "Cycle mode", 108, command = cycle_mode), TextButton((10, SCREEN_HEIGHT - 30), "Zoom +", 70, command = lambda : change_scale(2)), TextButton((85, SCREEN_HEIGHT - 30), "Zoom -", 68, command = lambda : change_scale(-2)), TextButton((SCREEN_WIDTH - 61, 10), "Load", 51, command = load_file), TextButton((SCREEN_WIDTH - 61, 40), "Save", 51, command = save_file))
+canvas_buttons = tuple([TextButton((22 + 55*i, 45), "Select", width = 38, height = 15, command = partial(set_colour, i), text_size = 15, text_offset = 3) for i in range(6)]) + (
+    TextButton((10, 65), "Reset", 54, command = reset_canvas), TextButton((10, 95), "Toggle outlines", 136, command = toggle_outlines),
+    TextButton((10, SCREEN_HEIGHT - 30), "Zoom +", 70, command = lambda : change_scale(2)), TextButton((85, SCREEN_HEIGHT - 30), "Zoom -", 68, command = lambda : change_scale(-2)),
+    TextButton((SCREEN_WIDTH - 61, 10), "Load", 51, command = load_file), TextButton((SCREEN_WIDTH - 61, 40), "Save", 51, command = save_file),
+    IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 180), 40, 40, draw_quarter_triangles_icon, command = lambda : change_mode(0), icon_offset = (5, 5)), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 135), 40, 40, draw_half_triangles1_icon, command = lambda : change_mode(1), icon_offset = (5, 5)), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 90), 40, 40, draw_half_triangles2_icon, command = lambda : change_mode(2), icon_offset = (5, 5)), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 45), 40, 40, draw_squares_icon, command = lambda : change_mode(3), icon_offset = (5, 5))
+    )
 position = [0, 0] # Camera position
 show_outlines = True
 selected_colour = (150,150,150)
