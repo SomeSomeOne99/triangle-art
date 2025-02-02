@@ -15,8 +15,12 @@ class ColourButton():
     def __init__(self, position, colour):
         self.rect = pygame.Rect(position[0], position[1], 50, 50)
         self.colour = colour
-    def draw(self, screen):
+    def draw(self, screen, mouse_pos, selected):
         pygame.draw.rect(screen, self.colour, self.rect)
+        if selected:
+            pygame.draw.rect(screen, (75,200,75), colour_button.rect, width = 2)
+        else:
+            pygame.draw.rect(screen, (200,200,200) if self.check_click(mouse_pos) else (100,100,100), colour_button.rect, width = 2)
     def check_click(self, mouse_pos):
         return self.rect.collidepoint(mouse_pos)
 class TextButton():
@@ -24,13 +28,15 @@ class TextButton():
         self.rect = pygame.Rect(position[0], position[1], width, 25)
         self.text = text
         self.command = command
-    def draw(self, screen):
+    def draw(self, screen, mouse_pos):
         pygame.draw.rect(screen, (200,200,200), self.rect)
         pygame.draw.rect(screen, (100,100,100), self.rect, width = 2)
         font = pygame.font.Font(None, 25)
         text = font.render(self.text, True, (0,0,0,0))
         text_rect = text.get_rect(left = self.rect.left + 5, centery = self.rect.centery)
         screen.blit(text, text_rect)
+        if self.check_click(mouse_pos):
+            pygame.draw.rect(screen, (200,200,200), canvas_button.rect, width = 2)
     def check_click(self, mouse_pos):
         return self.rect.collidepoint(mouse_pos)
 def reset_canvas():
@@ -160,14 +166,8 @@ while running:
             if triangles[y][x][3] != (0,0,0):
                 pygame.draw.polygon(screen, triangles[y][x][3], [(x*scale - position[0], y*scale - position[1]), (x*scale+(scale/2) - position[0], y*scale+(scale/2) - position[1]), (x*scale - position[0], y*scale+scale - position[1])])
     for colour_button in colour_buttons:
-        colour_button.draw(screen)
-        if colour_button.colour == selected_colour:
-            pygame.draw.rect(screen, (75,200,75), colour_button.rect, width = 2)
-        else:
-            pygame.draw.rect(screen, (200,200,200) if colour_button.check_click(pygame.mouse.get_pos()) else (100,100,100), colour_button.rect, width = 2)
+        colour_button.draw(screen, pygame.mouse.get_pos(), colour_button.colour == selected_colour)
     for canvas_button in canvas_buttons:
-        canvas_button.draw(screen)
-        if canvas_button.check_click(pygame.mouse.get_pos()):
-            pygame.draw.rect(screen, (200,200,200), canvas_button.rect, width = 2)
+        canvas_button.draw(screen, pygame.mouse.get_pos())
     pygame.display.flip() # Update screen
     clock.tick(FPS) # Wait for next frame
