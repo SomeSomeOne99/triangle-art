@@ -124,7 +124,7 @@ running = True
 scale = 50
 triangles = [[[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(50)] for _ in range(50)]
 colour_buttons = (ColourButton((10, 10), (0,0,0), command = partial(select_colour, 0)), ColourButton((65, 10), (150,150,150), command = partial(select_colour, 1)), ColourButton((120, 10), (255,255,255), command = partial(select_colour, 2)), ColourButton((175, 10), (255,0,0), command = partial(select_colour, 3)), ColourButton((230, 10), (0,255,0), command = partial(select_colour, 4)), ColourButton((285, 10), (0,0,255), command = partial(select_colour, 5)))
-canvas_buttons = tuple([TextButton((22 + 55*i, 45), "Select", width = 38, height = 15, command = partial(set_colour, i), text_size = 15, text_offset = 3) for i in range(6)]) + (
+canvas_buttons = tuple([TextButton((33 + 55*i, 45), "Edit", width = 27, height = 15, command = partial(set_colour, i), text_size = 15, text_offset = 3) for i in range(6)]) + (
     TextButton((10, 65), "Reset", 54, command = reset_canvas), TextButton((10, 95), "Toggle outlines", 136, command = toggle_outlines),
     TextButton((10, SCREEN_HEIGHT - 30), "Zoom +", 70, command = lambda : change_scale(2)), TextButton((85, SCREEN_HEIGHT - 30), "Zoom -", 68, command = lambda : change_scale(-2)),
     TextButton((SCREEN_WIDTH - 61, 10), "Load", 51, command = load_file), TextButton((SCREEN_WIDTH - 61, 40), "Save", 51, command = save_file))
