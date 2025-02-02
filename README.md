@@ -14,6 +14,9 @@ v1.0:
     - [X] Buttons to set new colours
     - [X] Tkinter-based colour selection window
   - [X] Buttons for canvas reset and zoom control
+  - [ ] Position and canvas size display
+- [ ] Efficiency
+  - [ ] Trim blank canvas
 - [ ] File operations
   - [X] Custom .tri format
   - [ ] Custom .tri2 format (improved efficiency)
