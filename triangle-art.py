@@ -49,20 +49,19 @@ class TextButton(Button):
         screen.blit(text, text_rect)
         if self.check_click(mouse_pos):
             pygame.draw.rect(screen, (200,200,200), canvas_button.rect, width = 2)
-class IconButton():
-    def __init__(self, position, width, height, icon_command = None, command = None, icon_offset = (0, 0)):
+class IconButton(Button):
+    def __init__(self, position, width, height, icon_command = None, command = None, icon_offset = (0, 0), value = None):
         self.rect = pygame.Rect(position[0], position[1], width, height)
         self.icon_command = icon_command
         self.command = command
         self.icon_position = (position[0] + icon_offset[0], position[1] + icon_offset[1])
-    def draw(self, screen, mouse_pos):
-        pygame.draw.rect(screen, (200,200,200), self.rect)
+        self.value = value
+    def draw(self, screen, mouse_pos, selected):
+        pygame.draw.rect(screen, (150,150,150) if selected else (200,200,200), self.rect)
         pygame.draw.rect(screen, (100,100,100), self.rect, width = 2)
         if self.check_click(mouse_pos):
             pygame.draw.rect(screen, (200,200,200), canvas_button.rect, width = 2)
         self.icon_command(screen, self.icon_position) # Draw button icon
-    def check_click(self, mouse_pos):
-        return self.rect.collidepoint(mouse_pos)
 # Icon drawing functions
 def draw_quarter_triangles_icon(screen, position):
     draw_half_triangles1_icon(screen, position) # Quarter triangles are composed of both half triangles
@@ -124,9 +123,8 @@ colour_buttons = (ColourButton((10, 10), (0,0,0)), ColourButton((65, 10), (150,1
 canvas_buttons = tuple([TextButton((22 + 55*i, 45), "Select", width = 38, height = 15, command = partial(set_colour, i), text_size = 15, text_offset = 3) for i in range(6)]) + (
     TextButton((10, 65), "Reset", 54, command = reset_canvas), TextButton((10, 95), "Toggle outlines", 136, command = toggle_outlines),
     TextButton((10, SCREEN_HEIGHT - 30), "Zoom +", 70, command = lambda : change_scale(2)), TextButton((85, SCREEN_HEIGHT - 30), "Zoom -", 68, command = lambda : change_scale(-2)),
-    TextButton((SCREEN_WIDTH - 61, 10), "Load", 51, command = load_file), TextButton((SCREEN_WIDTH - 61, 40), "Save", 51, command = save_file),
-    IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 180), 40, 40, draw_quarter_triangles_icon, command = lambda : change_mode(0), icon_offset = (5, 5)), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 135), 40, 40, draw_half_triangles1_icon, command = lambda : change_mode(1), icon_offset = (5, 5)), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 90), 40, 40, draw_half_triangles2_icon, command = lambda : change_mode(2), icon_offset = (5, 5)), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 45), 40, 40, draw_squares_icon, command = lambda : change_mode(3), icon_offset = (5, 5))
-    )
+    TextButton((SCREEN_WIDTH - 61, 10), "Load", 51, command = load_file), TextButton((SCREEN_WIDTH - 61, 40), "Save", 51, command = save_file))
+mode_buttons = (IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 180), 40, 40, draw_quarter_triangles_icon, command = lambda : change_mode(0), icon_offset = (5, 5), value = 0), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 135), 40, 40, draw_half_triangles1_icon, command = lambda : change_mode(1), icon_offset = (5, 5), value = 1), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 90), 40, 40, draw_half_triangles2_icon, command = lambda : change_mode(2), icon_offset = (5, 5), value = 2), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 45), 40, 40, draw_squares_icon, command = lambda : change_mode(3), icon_offset = (5, 5), value = 3))
 position = [0, 0] # Camera position
 show_outlines = True
 selected_colour = (150,150,150)
@@ -149,6 +147,12 @@ while running:
                         if colour_button.check_click(pygame.mouse.get_pos()):
                             button_selected = True
                             selected_colour = colour_button.colour
+                            break
+                if not button_selected:
+                    for mode_button in mode_buttons:
+                        if mode_button.check_click(pygame.mouse.get_pos()):
+                            button_selected = True
+                            mode_button.command()
                             break
                 if not button_selected:
                     triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
@@ -218,5 +222,7 @@ while running:
         colour_button.draw(screen, pygame.mouse.get_pos(), colour_button.colour == selected_colour)
     for canvas_button in canvas_buttons:
         canvas_button.draw(screen, pygame.mouse.get_pos())
+    for mode_button in mode_buttons:
+        mode_button.draw(screen, pygame.mouse.get_pos(), mode_button.value == triangle_mode)
     pygame.display.flip() # Update screen
     clock.tick(FPS) # Wait for next frame
