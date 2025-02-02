@@ -84,6 +84,14 @@ def set_colour(i):
         if colour_buttons[i].colour == selected_colour:
             selected_colour = chosen_colour
         colour_buttons[i].colour = chosen_colour
+def reset_colours():
+    global colour_buttons
+    colour_buttons[0].colour = (0,0,0)
+    colour_buttons[1].colour = (150,150,150)
+    colour_buttons[2].colour = (255,255,255)
+    colour_buttons[3].colour = (255,0,0)
+    colour_buttons[4].colour = (0,255,0)
+    colour_buttons[5].colour = (0,0,255)
 def reset_canvas():
     global triangles
     triangles = [[[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(len(triangles[y]))] for y in range(len(triangles))]
@@ -125,7 +133,7 @@ scale = 50
 triangles = [[[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(50)] for _ in range(50)]
 colour_buttons = (ColourButton((10, 10), (0,0,0), command = partial(select_colour, 0)), ColourButton((65, 10), (150,150,150), command = partial(select_colour, 1)), ColourButton((120, 10), (255,255,255), command = partial(select_colour, 2)), ColourButton((175, 10), (255,0,0), command = partial(select_colour, 3)), ColourButton((230, 10), (0,255,0), command = partial(select_colour, 4)), ColourButton((285, 10), (0,0,255), command = partial(select_colour, 5)))
 canvas_buttons = tuple([TextButton((33 + 55*i, 45), "Edit", width = 27, height = 15, command = partial(set_colour, i), text_size = 15, text_offset = 3) for i in range(6)]) + (
-    TextButton((10, 65), "Reset", 54, command = reset_canvas), TextButton((10, 95), "Toggle outlines", 136, command = toggle_outlines),
+    TextButton((10, 65), "Reset colours", 120, command = reset_colours), TextButton((10, 95), "Reset canvas", 116, command = reset_canvas), TextButton((10, 125), "Toggle outlines", 136, command = toggle_outlines),
     TextButton((10, SCREEN_HEIGHT - 30), "Zoom +", 70, command = lambda : change_scale(2)), TextButton((85, SCREEN_HEIGHT - 30), "Zoom -", 68, command = lambda : change_scale(-2)),
     TextButton((SCREEN_WIDTH - 61, 10), "Load", 51, command = load_file), TextButton((SCREEN_WIDTH - 61, 40), "Save", 51, command = save_file))
 mode_buttons = (IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 180), 40, 40, draw_quarter_triangles_icon, command = lambda : change_mode(0), icon_offset = (5, 5), value = 0), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 135), 40, 40, draw_half_triangles1_icon, command = lambda : change_mode(1), icon_offset = (5, 5), value = 1), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 90), 40, 40, draw_half_triangles2_icon, command = lambda : change_mode(2), icon_offset = (5, 5), value = 2), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 45), 40, 40, draw_squares_icon, command = lambda : change_mode(3), icon_offset = (5, 5), value = 3))
