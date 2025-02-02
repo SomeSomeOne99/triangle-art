@@ -3,10 +3,10 @@ A small pygame-based triangle art creation software written in Python
 ## Roadmap
 
 v1.0:
-- [ ] Drawing
+- [X] Drawing
   - [X] Quarter triangle, half triangle and square drawing modes
-  - [ ] Six active colours
-  - [ ] Drawing colour selection
+  - [X] Six active colours
+  - [X] Drawing colour selection
 - [X] UI update
   - [X] Buttons for triangle mode
     - [ ] Icon-based buttons
