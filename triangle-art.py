@@ -11,7 +11,18 @@ def save_file():
     if file_name != "":    
         with open(file_name, "w") as file:
             file.write("".join(["".join(["".join(["".join([str(colour) + "," for colour in triangle])[:-1] + ";" for triangle in triangleset])[:-1] + "|" for triangleset in row]) + "\n" for row in triangles]))
-class ColourButton():
+class Button():
+    def __init__(self, position, width, height, command = None):
+        self.rect = pygame.Rect(position[0], position[1], width, height)
+        self.command = command
+    def draw(self, screen, mouse_pos):
+        pygame.draw.rect(screen, (200,200,200), self.rect)
+        pygame.draw.rect(screen, (100,100,100), self.rect, width = 2)
+        if self.check_click(mouse_pos):
+            pygame.draw.rect(screen, (200,200,200), canvas_button.rect, width = 2)
+    def check_click(self, mouse_pos):
+        return self.rect.collidepoint(mouse_pos)
+class ColourButton(Button):
     def __init__(self, position, colour):
         self.rect = pygame.Rect(position[0], position[1], 50, 50)
         self.colour = colour
@@ -21,8 +32,6 @@ class ColourButton():
             pygame.draw.rect(screen, (75,200,75), colour_button.rect, width = 2)
         else:
             pygame.draw.rect(screen, (200,200,200) if self.check_click(mouse_pos) else (100,100,100), colour_button.rect, width = 2)
-    def check_click(self, mouse_pos):
-        return self.rect.collidepoint(mouse_pos)
 class TextButton():
     def __init__(self, position, text, width, command = None):
         self.rect = pygame.Rect(position[0], position[1], width, 25)
@@ -37,8 +46,6 @@ class TextButton():
         screen.blit(text, text_rect)
         if self.check_click(mouse_pos):
             pygame.draw.rect(screen, (200,200,200), canvas_button.rect, width = 2)
-    def check_click(self, mouse_pos):
-        return self.rect.collidepoint(mouse_pos)
 def reset_canvas():
     global triangles
     triangles = [[[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(len(triangles[y]))] for y in range(len(triangles))]
