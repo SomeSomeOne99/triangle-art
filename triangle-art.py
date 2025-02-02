@@ -24,9 +24,10 @@ class Button():
     def check_click(self, mouse_pos):
         return self.rect.collidepoint(mouse_pos)
 class ColourButton(Button):
-    def __init__(self, position, colour):
+    def __init__(self, position, colour, command = None):
         self.rect = pygame.Rect(position[0], position[1], 50, 50)
         self.colour = colour
+        self.command = command
     def draw(self, screen, mouse_pos, selected):
         pygame.draw.rect(screen, self.colour, self.rect)
         if selected:
@@ -73,6 +74,9 @@ def draw_half_triangles2_icon(screen, position):
 def draw_squares_icon(screen, position):
     pygame.draw.rect(screen, (50,50,50), (position[0], position[1], 30, 30), width = 1)
 # Button command functions
+def select_colour(i):
+    global selected_colour
+    selected_colour = colour_buttons[i].colour
 def set_colour(i):
     global colour_buttons, selected_colour
     chosen_colour = colorchooser.askcolor(colour_buttons[i].colour)[0]
@@ -119,7 +123,7 @@ FPS = 30
 running = True
 scale = 50
 triangles = [[[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(50)] for _ in range(50)]
-colour_buttons = (ColourButton((10, 10), (0,0,0)), ColourButton((65, 10), (150,150,150)), ColourButton((120, 10), (255,255,255)), ColourButton((175, 10), (255,0,0)), ColourButton((230, 10), (0,255,0)), ColourButton((285, 10), (0,0,255)))
+colour_buttons = (ColourButton((10, 10), (0,0,0), command = partial(select_colour, 0)), ColourButton((65, 10), (150,150,150), command = partial(select_colour, 1)), ColourButton((120, 10), (255,255,255), command = partial(select_colour, 2)), ColourButton((175, 10), (255,0,0), command = partial(select_colour, 3)), ColourButton((230, 10), (0,255,0), command = partial(select_colour, 4)), ColourButton((285, 10), (0,0,255), command = partial(select_colour, 5)))
 canvas_buttons = tuple([TextButton((22 + 55*i, 45), "Select", width = 38, height = 15, command = partial(set_colour, i), text_size = 15, text_offset = 3) for i in range(6)]) + (
     TextButton((10, 65), "Reset", 54, command = reset_canvas), TextButton((10, 95), "Toggle outlines", 136, command = toggle_outlines),
     TextButton((10, SCREEN_HEIGHT - 30), "Zoom +", 70, command = lambda : change_scale(2)), TextButton((85, SCREEN_HEIGHT - 30), "Zoom -", 68, command = lambda : change_scale(-2)),
@@ -137,23 +141,11 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: # Left click
                 button_selected = False
-                for canvas_button in canvas_buttons:
-                    if canvas_button.check_click(pygame.mouse.get_pos()):
+                for button in canvas_buttons + colour_buttons + mode_buttons:
+                    if button.check_click(pygame.mouse.get_pos()):
                         button_selected = True
-                        canvas_button.command()
+                        button.command()
                         break
-                if not button_selected:
-                    for colour_button in colour_buttons:
-                        if colour_button.check_click(pygame.mouse.get_pos()):
-                            button_selected = True
-                            selected_colour = colour_button.colour
-                            break
-                if not button_selected:
-                    for mode_button in mode_buttons:
-                        if mode_button.check_click(pygame.mouse.get_pos()):
-                            button_selected = True
-                            mode_button.command()
-                            break
                 if not button_selected:
                     triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
                     for i in triangles_i:
