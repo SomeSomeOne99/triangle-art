@@ -9,7 +9,7 @@ v1.0:
   - [X] Drawing colour selection
 - [X] UI update
   - [X] Buttons for triangle mode
-    - [ ] Icon-based buttons
+    - [X] Icon-based buttons
   - [x] Buttons for colour selection
     - [X] Buttons to set new colours
     - [X] Tkinter-based colour selection window
