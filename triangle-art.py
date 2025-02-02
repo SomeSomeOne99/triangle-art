@@ -1,5 +1,6 @@
 import pygame
-from tkinter import filedialog
+from tkinter import filedialog, colorchooser
+from functools import partial
 def load_file():
     file_name = filedialog.askopenfilename(filetypes = [("Triangle Art Files", "*.tri")])
     if file_name != "":
@@ -48,6 +49,13 @@ class TextButton(Button):
         screen.blit(text, text_rect)
         if self.check_click(mouse_pos):
             pygame.draw.rect(screen, (200,200,200), canvas_button.rect, width = 2)
+def set_colour(i):
+    global colour_buttons, selected_colour
+    chosen_colour = colorchooser.askcolor(colour_buttons[i].colour)[0]
+    if chosen_colour != None:
+        if colour_buttons[i].colour == selected_colour:
+            selected_colour = chosen_colour
+        colour_buttons[i].colour = chosen_colour
 def reset_canvas():
     global triangles
     triangles = [[[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(len(triangles[y]))] for y in range(len(triangles))]
@@ -88,8 +96,8 @@ FPS = 30
 running = True
 scale = 50
 triangles = [[[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(50)] for _ in range(50)]
-colour_buttons = (ColourButton((10, 10), (0,0,0)), ColourButton((65, 10), (150,150,150)), ColourButton((120, 10), (255,255,255)))
-canvas_buttons = (TextButton((10, 65), "Reset", 54, reset_canvas), TextButton((10, 95), "Toggle outlines", 136, toggle_outlines), TextButton((10, 125), "Cycle mode", 108, cycle_mode), TextButton((10, SCREEN_HEIGHT - 30), "Zoom +", 70, lambda : change_scale(2)), TextButton((85, SCREEN_HEIGHT - 30), "Zoom -", 68, lambda : change_scale(-2)), TextButton((SCREEN_WIDTH - 61, 10), "Load", 51, load_file), TextButton((SCREEN_WIDTH - 61, 40), "Save", 51, save_file))
+colour_buttons = (ColourButton((10, 10), (0,0,0)), ColourButton((65, 10), (150,150,150)), ColourButton((120, 10), (255,255,255)), ColourButton((175, 10), (255,0,0)), ColourButton((230, 10), (0,255,0)), ColourButton((285, 10), (0,0,255)))
+canvas_buttons = tuple([TextButton((22 + 55*i, 45), "Select", width = 38, height = 15, command = partial(set_colour, i), text_size = 15, text_offset = 3) for i in range(6)]) + (TextButton((10, 65), "Reset", 54, command = reset_canvas), TextButton((10, 95), "Toggle outlines", 136, command = toggle_outlines), TextButton((10, 125), "Cycle mode", 108, command = cycle_mode), TextButton((10, SCREEN_HEIGHT - 30), "Zoom +", 70, command = lambda : change_scale(2)), TextButton((85, SCREEN_HEIGHT - 30), "Zoom -", 68, command = lambda : change_scale(-2)), TextButton((SCREEN_WIDTH - 61, 10), "Load", 51, command = load_file), TextButton((SCREEN_WIDTH - 61, 40), "Save", 51, command = save_file))
 position = [0, 0] # Camera position
 show_outlines = True
 selected_colour = (150,150,150)
@@ -102,14 +110,17 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: # Left click
                 button_selected = False
-                for colour_button in colour_buttons:
-                    if colour_button.check_click(pygame.mouse.get_pos()):
-                        button_selected = True
-                        selected_colour = colour_button.colour
                 for canvas_button in canvas_buttons:
                     if canvas_button.check_click(pygame.mouse.get_pos()):
                         button_selected = True
                         canvas_button.command()
+                        break
+                if not button_selected:
+                    for colour_button in colour_buttons:
+                        if colour_button.check_click(pygame.mouse.get_pos()):
+                            button_selected = True
+                            selected_colour = colour_button.colour
+                            break
                 if not button_selected:
                     triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
                     for i in triangles_i:
