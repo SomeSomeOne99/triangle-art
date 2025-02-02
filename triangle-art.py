@@ -32,7 +32,7 @@ class ColourButton(Button):
             pygame.draw.rect(screen, (75,200,75), colour_button.rect, width = 2)
         else:
             pygame.draw.rect(screen, (200,200,200) if self.check_click(mouse_pos) else (100,100,100), colour_button.rect, width = 2)
-class TextButton():
+class TextButton(Button):
     def __init__(self, position, text, width, command = None):
         self.rect = pygame.Rect(position[0], position[1], width, 25)
         self.text = text
