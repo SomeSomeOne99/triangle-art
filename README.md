@@ -11,8 +11,8 @@ v1.0:
   - [X] Buttons for triangle mode
     - [ ] Icon-based buttons
   - [x] Buttons for colour selection
-    - [ ] Buttons to set new colours
-    - [ ] Tkinter-based colour selection window
+    - [X] Buttons to set new colours
+    - [X] Tkinter-based colour selection window
   - [X] Buttons for canvas reset and zoom control
 - [ ] File operations
   - [X] Custom .tri format
