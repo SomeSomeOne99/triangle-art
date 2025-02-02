@@ -33,16 +33,18 @@ class ColourButton(Button):
         else:
             pygame.draw.rect(screen, (200,200,200) if self.check_click(mouse_pos) else (100,100,100), colour_button.rect, width = 2)
 class TextButton(Button):
-    def __init__(self, position, text, width, command = None):
-        self.rect = pygame.Rect(position[0], position[1], width, 25)
+    def __init__(self, position, text, width, height = 25, command = None, text_size = 25, text_offset = 5):
+        self.rect = pygame.Rect(position[0], position[1], width, height)
         self.text = text
         self.command = command
+        self.text_size = text_size
+        self.text_offset = text_offset
     def draw(self, screen, mouse_pos):
         pygame.draw.rect(screen, (200,200,200), self.rect)
         pygame.draw.rect(screen, (100,100,100), self.rect, width = 2)
-        font = pygame.font.Font(None, 25)
+        font = pygame.font.Font(None, self.text_size)
         text = font.render(self.text, True, (0,0,0,0))
-        text_rect = text.get_rect(left = self.rect.left + 5, centery = self.rect.centery)
+        text_rect = text.get_rect(left = self.rect.left + self.text_offset, centery = self.rect.centery)
         screen.blit(text, text_rect)
         if self.check_click(mouse_pos):
             pygame.draw.rect(screen, (200,200,200), canvas_button.rect, width = 2)
