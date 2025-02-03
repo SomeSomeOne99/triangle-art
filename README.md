@@ -26,8 +26,8 @@ v1.0:
     - [ ] Dictionary-based compression
   - [ ] PPM (.ppm) format export
 - [ ] Settings
-  - [ ] Tkinter-based settings window
-  - [ ] Keyboard controls display
-  - [ ] pygame window size control
-  - [ ] FPS target modification
+  - [X] Tkinter-based settings window
+  - [X] Keyboard controls display
+  - [X] pygame window size control
+  - [X] FPS target modification
   - [ ] .set file for settings preservation

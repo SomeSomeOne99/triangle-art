@@ -1,5 +1,5 @@
 import pygame
-from tkinter import filedialog, colorchooser
+from tkinter import filedialog, colorchooser, Tk, ttk, VERTICAL, N, E, W
 from functools import partial
 def load_file():
     file_name = filedialog.askopenfilename(filetypes = [("Triangle Art Files", "*.tri")])
@@ -109,6 +109,72 @@ def change_scale(change):
     scale += change
     position[1] = prev_y * scale
     position[0] = prev_x * scale
+# Settings
+def settings():
+    def set_fps():
+        global fps
+        fps = int(fpsSpinbox.get())
+        print(fps)
+    def set_display():
+        global screen_width, screen_height, screen, canvas_buttons, mode_buttons
+        screen_width = int(displayWidthSpinbox.get())
+        screen_height = int(displayHeightSpinbox.get())
+        screen = pygame.display.set_mode((screen_width, screen_height))
+        # placeholder, efficiency improvement intended
+        canvas_buttons = tuple([TextButton((33 + 55*i, 45), "Edit", width = 27, height = 15, command = partial(set_colour, i), text_size = 15, text_offset = 3) for i in range(6)]) + (
+            TextButton((10, 65), "Reset colours", 120, command = reset_colours), TextButton((10, 95), "Reset canvas", 116, command = reset_canvas), TextButton((10, 125), "Toggle outlines", 136, command = toggle_outlines),
+            TextButton((10, 155), "Settings", 100, command = settings),
+            TextButton((10, screen_height - 30), "Zoom +", 70, command = lambda : change_scale(2)), TextButton((85, screen_height - 30), "Zoom -", 68, command = lambda : change_scale(-2)),
+            TextButton((screen_width - 61, 10), "Load", 51, command = load_file), TextButton((screen_width - 61, 40), "Save", 51, command = save_file))
+        mode_buttons = (IconButton((screen_width - 45, screen_height - 180), 40, 40, draw_quarter_triangles_icon, command = lambda : change_mode(0), icon_offset = (5, 5), value = 0), IconButton((screen_width - 45, screen_height - 135), 40, 40, draw_half_triangles1_icon, command = lambda : change_mode(1), icon_offset = (5, 5), value = 1), IconButton((screen_width - 45, screen_height - 90), 40, 40, draw_half_triangles2_icon, command = lambda : change_mode(2), icon_offset = (5, 5), value = 2), IconButton((screen_width - 45, screen_height - 45), 40, 40, draw_squares_icon, command = lambda : change_mode(3), icon_offset = (5, 5), value = 3))
+    root = Tk()
+    mainframe = ttk.Frame(root)
+    mainframe.grid(column = 0, row = 0)
+    leftPanedwindow = ttk.Panedwindow(mainframe, orient = VERTICAL)
+    leftPanedwindow.grid(column = 0, row = 0, padx = 5, sticky = (N))
+    performanceFrame = ttk.Labelframe(leftPanedwindow, text = "Performance", width = 75, height = 75)
+    ttk.Label(performanceFrame, text = "Target FPS: ").grid(column = 0, row = 0, padx = 5, sticky = (E))
+    fpsSpinbox = ttk.Spinbox(performanceFrame, from_ = 0, to = float("inf"), command = set_fps, width = 3)
+    fpsSpinbox.set(fps)
+    fpsSpinbox.grid(column = 1, row = 0, padx = (0, 5))
+    leftPanedwindow.add(performanceFrame)
+    windowFrame = ttk.Labelframe(leftPanedwindow, text = "Display", width = 75, height = 75)
+    ttk.Label(windowFrame, text = "Width: ").grid(column = 0, row = 0, padx = 5, sticky = (E))
+    displayWidthSpinbox = ttk.Spinbox(windowFrame, from_ = 0, to = float("inf"), command = set_display, width = 5)
+    displayWidthSpinbox.set(screen_width)
+    displayWidthSpinbox.grid(column = 1, row = 0, padx = (0, 5))
+    ttk.Label(windowFrame, text = "Height: ").grid(column = 0, row = 1, padx = 5, sticky = (E))
+    displayHeightSpinbox = ttk.Spinbox(windowFrame, from_ = 0, to = float("inf"), command = set_display, width = 5)
+    displayHeightSpinbox.set(screen_height)
+    displayHeightSpinbox.grid(column = 1, row = 1, padx = (0, 5))
+    leftPanedwindow.add(windowFrame)
+    rightPanedwindow = ttk.Panedwindow(mainframe)
+    rightPanedwindow.grid(column = 1, row = 0, padx = (0, 5))
+    controlsFrame = ttk.Labelframe(rightPanedwindow, text = "Controls")
+    controlsPanedwindow = ttk.Panedwindow(controlsFrame)
+    controlsPanedwindow.grid(column = 0, row = 0)
+    keyboardControlsFrame = ttk.Labelframe(controlsPanedwindow, text = "Keyboard")
+    ttk.Label(keyboardControlsFrame, text = "W,A,S,D:").grid(column = 0, row = 0, sticky = (E))
+    ttk.Label(keyboardControlsFrame, text = "Move camera").grid(column = 1, row = 0, sticky = (W))
+    ttk.Label(keyboardControlsFrame, text = "Shift + W,A,S,D:").grid(column = 0, row = 1, sticky = (E))
+    ttk.Label(keyboardControlsFrame, text = "Move camera at higher speed").grid(column = 1, row = 1, sticky = (W))
+    ttk.Label(keyboardControlsFrame, text = "+/-:").grid(column = 0, row = 2, sticky = (E))
+    ttk.Label(keyboardControlsFrame, text = "Zoom in/out").grid(column = 1, row = 2, sticky = (W))
+    controlsPanedwindow.add(keyboardControlsFrame)
+    mouseControlsFrame = ttk.Labelframe(controlsPanedwindow, text = "Mouse")
+    ttk.Label(mouseControlsFrame, text = "Left Click:").grid(column = 0, row = 0, sticky = (E))
+    ttk.Label(mouseControlsFrame, text = "Draw with selected colour").grid(column = 1, row = 0, sticky = (W))
+    ttk.Label(mouseControlsFrame, text = "Scroll Click:").grid(column = 0, row = 1, sticky = (E))
+    ttk.Label(mouseControlsFrame, text = "Set selected colour to hover target*").grid(column = 1, row = 1, sticky = (W))
+    ttk.Label(mouseControlsFrame, text = "Right Click:").grid(column = 0, row = 2, sticky = (E))
+    ttk.Label(mouseControlsFrame, text = "Erase (draw with #000000)").grid(column = 1, row = 2, sticky = (W))
+    ttk.Label(mouseControlsFrame, text = "Scroll Up:").grid(column = 0, row = 3, sticky = (E))
+    ttk.Label(mouseControlsFrame, text = "Cycle up colours*").grid(column = 1, row = 3, sticky = (W))
+    ttk.Label(mouseControlsFrame, text = "Scroll Down:").grid(column = 0, row = 4, sticky = (E))
+    ttk.Label(mouseControlsFrame, text = "Cycle down colours*").grid(column = 1, row = 4, sticky = (W))
+    controlsPanedwindow.add(mouseControlsFrame)
+    rightPanedwindow.add(controlsFrame)
+    root.mainloop()
 # Calculation functions
 def position_to_triangle(mouse_pos):
     mouse_pos = [mouse_pos[0] + position[0], mouse_pos[1] + position[1]]
@@ -125,19 +191,20 @@ def position_to_triangle(mouse_pos):
         triangles_i = (2, 3) if (mouse_pos[1] - triangles_y*scale) > (mouse_pos[0] - triangles_x*scale) else (0, 1)
     return triangles_y, triangles_x, triangles_i
 pygame.init()
-SCREEN_WIDTH, SCREEN_HEIGHT = 500, 500
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen_width, screen_height = 500, 500
+screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
-FPS = 30
+fps = 30
 running = True
 scale = 50
 triangles = [[[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(50)] for _ in range(50)]
 colour_buttons = (ColourButton((10, 10), (0,0,0), command = partial(select_colour, 0)), ColourButton((65, 10), (150,150,150), command = partial(select_colour, 1)), ColourButton((120, 10), (255,255,255), command = partial(select_colour, 2)), ColourButton((175, 10), (255,0,0), command = partial(select_colour, 3)), ColourButton((230, 10), (0,255,0), command = partial(select_colour, 4)), ColourButton((285, 10), (0,0,255), command = partial(select_colour, 5)))
 canvas_buttons = tuple([TextButton((33 + 55*i, 45), "Edit", width = 27, height = 15, command = partial(set_colour, i), text_size = 15, text_offset = 3) for i in range(6)]) + (
     TextButton((10, 65), "Reset colours", 120, command = reset_colours), TextButton((10, 95), "Reset canvas", 116, command = reset_canvas), TextButton((10, 125), "Toggle outlines", 136, command = toggle_outlines),
-    TextButton((10, SCREEN_HEIGHT - 30), "Zoom +", 70, command = lambda : change_scale(2)), TextButton((85, SCREEN_HEIGHT - 30), "Zoom -", 68, command = lambda : change_scale(-2)),
-    TextButton((SCREEN_WIDTH - 61, 10), "Load", 51, command = load_file), TextButton((SCREEN_WIDTH - 61, 40), "Save", 51, command = save_file))
-mode_buttons = (IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 180), 40, 40, draw_quarter_triangles_icon, command = lambda : change_mode(0), icon_offset = (5, 5), value = 0), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 135), 40, 40, draw_half_triangles1_icon, command = lambda : change_mode(1), icon_offset = (5, 5), value = 1), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 90), 40, 40, draw_half_triangles2_icon, command = lambda : change_mode(2), icon_offset = (5, 5), value = 2), IconButton((SCREEN_WIDTH - 45, SCREEN_HEIGHT - 45), 40, 40, draw_squares_icon, command = lambda : change_mode(3), icon_offset = (5, 5), value = 3))
+    TextButton((10, 155), "Settings", 100, command = settings),
+    TextButton((10, screen_height - 30), "Zoom +", 70, command = lambda : change_scale(2)), TextButton((85, screen_height - 30), "Zoom -", 68, command = lambda : change_scale(-2)),
+    TextButton((screen_width - 61, 10), "Load", 51, command = load_file), TextButton((screen_width - 61, 40), "Save", 51, command = save_file))
+mode_buttons = (IconButton((screen_width - 45, screen_height - 180), 40, 40, draw_quarter_triangles_icon, command = lambda : change_mode(0), icon_offset = (5, 5), value = 0), IconButton((screen_width - 45, screen_height - 135), 40, 40, draw_half_triangles1_icon, command = lambda : change_mode(1), icon_offset = (5, 5), value = 1), IconButton((screen_width - 45, screen_height - 90), 40, 40, draw_half_triangles2_icon, command = lambda : change_mode(2), icon_offset = (5, 5), value = 2), IconButton((screen_width - 45, screen_height - 45), 40, 40, draw_squares_icon, command = lambda : change_mode(3), icon_offset = (5, 5), value = 3))
 position = [0, 0] # Camera position
 show_outlines = True
 selected_colour = (150,150,150)
@@ -188,7 +255,7 @@ while running:
             elif pygame.mouse.get_pressed()[2]: # Right click
                 for i in triangles_i:
                     triangles[triangles_y][triangles_x][i] = (0,0,0) # Clear triangle
-    while position[0] < 0 or position[1] < 0 or (position[0] + SCREEN_WIDTH) // scale >= len(triangles[0]) or (position[1] + SCREEN_HEIGHT) // scale >= len(triangles):
+    while position[0] < 0 or position[1] < 0 or (position[0] + screen_width) // scale >= len(triangles[0]) or (position[1] + screen_height) // scale >= len(triangles):
         while position[0] < 0: # Add more triangles to the left
             position[0] += scale
             for row in triangles:
@@ -196,10 +263,10 @@ while running:
         while position[1] < 0: # Add more triangles to the top
             position[1] += scale
             triangles.insert(0, [[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(len(triangles[0]))])
-        while (position[0] + SCREEN_WIDTH) // scale >= len(triangles[0]): # Add more triangles to the right
+        while (position[0] + screen_width) // scale >= len(triangles[0]): # Add more triangles to the right
             for row in triangles:
                 row.append([(0,0,0), (0,0,0), (0,0,0), (0,0,0)])
-        while (position[1] + SCREEN_HEIGHT) // scale >= len(triangles): # Add more triangles to the bottom
+        while (position[1] + screen_height) // scale >= len(triangles): # Add more triangles to the bottom
             triangles.append([[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(len(triangles[0]))])
     # Trim blank canvas rows/columns
     blank = True
@@ -230,7 +297,7 @@ while running:
             triangles[y].pop(0) # Clear first column if blank
         position[0] -= scale
     blank = True
-    for y in range(len(triangles) - 1, int((position[1] + SCREEN_HEIGHT) // scale), -1): # Trim rows below camera
+    for y in range(len(triangles) - 1, int((position[1] + screen_height) // scale), -1): # Trim rows below camera
         for x in range(len(triangles[y])):
             for triangle in triangles[y][x]:
                 if triangle != (0,0,0):
@@ -242,7 +309,7 @@ while running:
             break
         triangles.pop(len(triangles) - 1) # Clear last row if blank
     blank = True
-    for x in range(len(triangles[0]) - 1, int((position[0] + SCREEN_WIDTH) // scale), -1): # Trim columns right of camera
+    for x in range(len(triangles[0]) - 1, int((position[0] + screen_width) // scale), -1): # Trim columns right of camera
         for y in range(len(triangles)):
             for triangle in triangles[y][x]:
                 if triangle != (0,0,0):
@@ -255,8 +322,8 @@ while running:
         for y in range(len(triangles)):
             triangles[y].pop(len(triangles[y]) - 1) # Clear last column if blank
     screen.fill((0, 0, 0)) # Reset screen
-    for y in range(int(position[1] // scale), int((position[1] + SCREEN_HEIGHT) // scale) + 1):
-        for x in range(int(position[0] // scale), int((position[0] + SCREEN_WIDTH) // scale) + 1):
+    for y in range(int(position[1] // scale), int((position[1] + screen_height) // scale) + 1):
+        for x in range(int(position[0] // scale), int((position[0] + screen_width) // scale) + 1):
             if show_outlines and (triangles[y][x][0] == (0,0,0) or triangles[y][x][1] == (0,0,0) or triangles[y][x][2] == (0,0,0) or triangles[y][x][3] == (0,0,0)):
                 if triangle_mode == 3:
                     pygame.draw.rect(screen, (50,50,50), (x*scale - position[0], y*scale - position[1], scale, scale), width = 1)
@@ -264,8 +331,8 @@ while running:
                     pygame.draw.polygon(screen, (50,50,50), [(x*scale - position[0], y*scale - position[1]), (x*scale - position[0], y*scale+scale - position[1]), (x*scale+scale - position[0], y*scale+scale - position[1])], width = 1)
                 if triangle_mode == 0 or triangle_mode == 1:
                     pygame.draw.polygon(screen, (50,50,50), [(x*scale+scale - position[0], y*scale - position[1]), (x*scale+scale - position[0], y*scale+scale - position[1]), (x*scale - position[0], y*scale+scale - position[1])], width = 1)
-    for y in range(int(position[1] // scale), int((position[1] + SCREEN_HEIGHT) // scale) + 1):
-        for x in range(int(position[0] // scale), int((position[0] + SCREEN_WIDTH) // scale) + 1):
+    for y in range(int(position[1] // scale), int((position[1] + screen_height) // scale) + 1):
+        for x in range(int(position[0] // scale), int((position[0] + screen_width) // scale) + 1):
             if triangles[y][x][0] != (0,0,0):
                 pygame.draw.polygon(screen, triangles[y][x][0], [(x*scale - position[0], y*scale - position[1]), (x*scale+(scale/2) - position[0], y*scale+(scale/2) - position[1]), (x*scale+scale - position[0], y*scale - position[1])])
             if triangles[y][x][1] != (0,0,0):
@@ -281,4 +348,4 @@ while running:
     for mode_button in mode_buttons:
         mode_button.draw(screen, pygame.mouse.get_pos(), mode_button.value == triangle_mode)
     pygame.display.flip() # Update screen
-    clock.tick(FPS) # Wait for next frame
+    clock.tick(fps) # Wait for next frame
