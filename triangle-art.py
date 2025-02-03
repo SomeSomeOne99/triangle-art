@@ -165,7 +165,7 @@ def settings():
     ttk.Label(mouseControlsFrame, text = "Left Click:").grid(column = 0, row = 0, sticky = (E))
     ttk.Label(mouseControlsFrame, text = "Draw with selected colour").grid(column = 1, row = 0, sticky = (W))
     ttk.Label(mouseControlsFrame, text = "Scroll Click:").grid(column = 0, row = 1, sticky = (E))
-    ttk.Label(mouseControlsFrame, text = "Set selected colour to hover target*").grid(column = 1, row = 1, sticky = (W))
+    ttk.Label(mouseControlsFrame, text = "Set selected colour to hover target").grid(column = 1, row = 1, sticky = (W))
     ttk.Label(mouseControlsFrame, text = "Right Click:").grid(column = 0, row = 2, sticky = (E))
     ttk.Label(mouseControlsFrame, text = "Erase (draw with #000000)").grid(column = 1, row = 2, sticky = (W))
     ttk.Label(mouseControlsFrame, text = "Scroll Up:").grid(column = 0, row = 3, sticky = (E))
@@ -231,6 +231,9 @@ while running:
                         triangles[triangles_y][triangles_x][i] = selected_colour
             elif event.button == 2:
                 triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos(), 0)
+                for i in range(6):
+                    if colour_buttons[i].colour == selected_colour:
+                        colour_buttons[i].colour = triangles[triangles_y][triangles_x][triangles_i[0]]
                 selected_colour = triangles[triangles_y][triangles_x][triangles_i[0]]
             elif event.button == 3: # Right click
                 triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
