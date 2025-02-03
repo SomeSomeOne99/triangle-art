@@ -242,7 +242,7 @@ while running:
             elif event.y == -1:
                 selected_colour_button = (selected_colour_button - 1) % 6
     keys_pressed = pygame.key.get_pressed()
-    if keys_pressed[pygame.K_PLUS] or keys_pressed[pygame.K_KP_PLUS]: # Increase scale
+    if keys_pressed[pygame.K_EQUALS] or keys_pressed[pygame.K_KP_PLUS]: # Increase scale
         change_scale(2)
     elif (keys_pressed[pygame.K_MINUS] or keys_pressed[pygame.K_KP_MINUS]) and scale > 2: # Decrease scale
         change_scale(-2)
