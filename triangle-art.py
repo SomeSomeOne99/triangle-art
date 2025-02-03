@@ -209,7 +209,6 @@ position = [0, 0] # Camera position
 show_outlines = True
 selected_colour_button = 1
 button_selected = False
-clearCount = 0
 triangle_mode = 0 # 0 = quarter triangle, 1 = half triangle top-right/bottom-left, 2 = half triangle top-left/bottom-right, 3 = squares
 while running:
     for event in pygame.event.get():
