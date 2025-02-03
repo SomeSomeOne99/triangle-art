@@ -68,7 +68,7 @@ def draw_quarter_triangles_icon(screen, position):
     draw_half_triangles1_icon(screen, position) # Quarter triangles are composed of both half triangles
     draw_half_triangles2_icon(screen, position)
 def draw_half_triangles1_icon(screen, position):
-    pygame.draw.polygon(screen, (0,0,0), [(position[0], position[1]), (position[0], position[1] + 30), (position[0] + 30, position[1]), (position[0], position[1] + 30), (position[0] + 30, position[1] + 30), (position[0] + 30, position[1])], width = 1)
+    pygame.draw.polygon(screen, (0,0,0), [(position[0] + 30, position[1]), (position[0], position[1] + 30), (position[0], position[1]), (position[0] + 30, position[1]), (position[0] + 30, position[1] + 30), (position[0], position[1] + 30)], width = 1)
 def draw_half_triangles2_icon(screen, position):
     pygame.draw.polygon(screen, (0,0,0), [(position[0], position[1]), (position[0] + 30, position[1] + 30), (position[0], position[1] + 30), (position[0], position[1]), (position[0] + 30, position[1]), (position[0] + 30, position[1] + 30)], width = 1)
 def draw_squares_icon(screen, position):
