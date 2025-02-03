@@ -93,8 +93,9 @@ def reset_colours():
     colour_buttons[4].colour = (0,255,0)
     colour_buttons[5].colour = (0,0,255)
 def reset_canvas():
-    global triangles
-    triangles = [[[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(len(triangles[y]))] for y in range(len(triangles))]
+    global triangles, position
+    triangles = [[[(0,0,0) for _ in range(4)]]]
+    position = [0, 0]
 def toggle_outlines():
     global show_outlines
     show_outlines = not show_outlines
