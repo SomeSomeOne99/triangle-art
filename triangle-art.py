@@ -121,7 +121,7 @@ def settings():
         # placeholder, efficiency improvement intended
         canvas_buttons = tuple([TextButton((33 + 55*i, 45), "Edit", width = 27, height = 15, command = partial(set_colour, i), text_size = 15, text_offset = 3) for i in range(6)]) + (
             TextButton((10, 65), "Reset colours", 120, command = reset_colours), TextButton((10, 95), "Reset canvas", 116, command = reset_canvas), TextButton((10, 125), "Toggle outlines", 136, command = toggle_outlines),
-            TextButton((10, 155), "Settings", 100, command = settings),
+            TextButton((10, 155), "Settings", 81, command = settings),
             TextButton((10, screen_height - 30), "Zoom +", 70, command = lambda : change_scale(2)), TextButton((85, screen_height - 30), "Zoom -", 68, command = lambda : change_scale(-2)),
             TextButton((screen_width - 61, 10), "Load", 51, command = load_file), TextButton((screen_width - 61, 40), "Save", 51, command = save_file))
         mode_buttons = (IconButton((screen_width - 45, screen_height - 180), 40, 40, draw_quarter_triangles_icon, command = lambda : change_mode(0), icon_offset = (5, 5), value = 0), IconButton((screen_width - 45, screen_height - 135), 40, 40, draw_half_triangles1_icon, command = lambda : change_mode(1), icon_offset = (5, 5), value = 1), IconButton((screen_width - 45, screen_height - 90), 40, 40, draw_half_triangles2_icon, command = lambda : change_mode(2), icon_offset = (5, 5), value = 2), IconButton((screen_width - 45, screen_height - 45), 40, 40, draw_squares_icon, command = lambda : change_mode(3), icon_offset = (5, 5), value = 3))
