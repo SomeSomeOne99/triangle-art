@@ -167,9 +167,9 @@ def settings():
     ttk.Label(mouseControlsFrame, text = "Right Click:").grid(column = 0, row = 2, sticky = (E))
     ttk.Label(mouseControlsFrame, text = "Erase (draw with #000000)").grid(column = 1, row = 2, sticky = (W))
     ttk.Label(mouseControlsFrame, text = "Scroll Up:").grid(column = 0, row = 3, sticky = (E))
-    ttk.Label(mouseControlsFrame, text = "Cycle up colours*").grid(column = 1, row = 3, sticky = (W))
+    ttk.Label(mouseControlsFrame, text = "Cycle up colours").grid(column = 1, row = 3, sticky = (W))
     ttk.Label(mouseControlsFrame, text = "Scroll Down:").grid(column = 0, row = 4, sticky = (E))
-    ttk.Label(mouseControlsFrame, text = "Cycle down colours*").grid(column = 1, row = 4, sticky = (W))
+    ttk.Label(mouseControlsFrame, text = "Cycle down colours").grid(column = 1, row = 4, sticky = (W))
     controlsPanedwindow.add(mouseControlsFrame)
     rightPanedwindow.add(controlsFrame)
     root.mainloop()
@@ -236,27 +236,32 @@ while running:
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1: # Left click
                 target_code = None
-        keys_pressed = pygame.key.get_pressed()
-        if keys_pressed[pygame.K_PLUS] or keys_pressed[pygame.K_KP_PLUS]: # Increase scale
-            change_scale(2)
-        elif (keys_pressed[pygame.K_MINUS] or keys_pressed[pygame.K_KP_MINUS]) and scale > 2: # Decrease scale
-            change_scale(-2)
-        if keys_pressed[pygame.K_w]:
-            position[1] -= scale / (2 if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT] else 10)
-        if keys_pressed[pygame.K_s]:
-            position[1] += scale / (2 if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT] else 10)
-        if keys_pressed[pygame.K_a]:
-            position[0] -= scale / (2 if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT] else 10)
-        if keys_pressed[pygame.K_d]:
-            position[0] += scale / (2 if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT] else 10)
-        if pygame.mouse.get_pressed()[0] or pygame.mouse.get_pressed()[2]: # Left or right click
-            triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
-            if pygame.mouse.get_pressed()[0] and not button_selected: # Left click
-                for i in triangles_i:
-                    triangles[triangles_y][triangles_x][i] = colour_buttons[selected_colour_button].colour # Set triangle to same colour as clicked
-            elif pygame.mouse.get_pressed()[2]: # Right click
-                for i in triangles_i:
-                    triangles[triangles_y][triangles_x][i] = (0,0,0) # Clear triangle
+        elif event.type == pygame.MOUSEWHEEL:
+            if event.y == 1: # Scroll up
+                selected_colour_button = (selected_colour_button + 1) % 6
+            elif event.y == -1:
+                selected_colour_button = (selected_colour_button - 1) % 6
+    keys_pressed = pygame.key.get_pressed()
+    if keys_pressed[pygame.K_PLUS] or keys_pressed[pygame.K_KP_PLUS]: # Increase scale
+        change_scale(2)
+    elif (keys_pressed[pygame.K_MINUS] or keys_pressed[pygame.K_KP_MINUS]) and scale > 2: # Decrease scale
+        change_scale(-2)
+    if keys_pressed[pygame.K_w]:
+        position[1] -= scale / (2 if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT] else 10)
+    if keys_pressed[pygame.K_s]:
+        position[1] += scale / (2 if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT] else 10)
+    if keys_pressed[pygame.K_a]:
+        position[0] -= scale / (2 if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT] else 10)
+    if keys_pressed[pygame.K_d]:
+        position[0] += scale / (2 if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT] else 10)
+    if pygame.mouse.get_pressed()[0] or pygame.mouse.get_pressed()[2]: # Left or right click
+        triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
+        if pygame.mouse.get_pressed()[0] and not button_selected: # Left click
+            for i in triangles_i:
+                triangles[triangles_y][triangles_x][i] = colour_buttons[selected_colour_button].colour # Set triangle to same colour as clicked
+        elif pygame.mouse.get_pressed()[2]: # Right click
+            for i in triangles_i:
+                triangles[triangles_y][triangles_x][i] = (0,0,0) # Clear triangle
     while position[0] < 0 or position[1] < 0 or (position[0] + screen_width) // scale >= len(triangles[0]) or (position[1] + screen_height) // scale >= len(triangles):
         while position[0] < 0: # Add more triangles to the left
             position[0] += scale
