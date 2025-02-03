@@ -176,7 +176,9 @@ def settings():
     rightPanedwindow.add(controlsFrame)
     root.mainloop()
 # Calculation functions
-def position_to_triangle(mouse_pos):
+def position_to_triangle(mouse_pos, triangle_mode_ = None):
+    if triangle_mode_ is None: # No mode specified
+        triangle_mode_ = triangle_mode
     mouse_pos = [mouse_pos[0] + position[0], mouse_pos[1] + position[1]]
     triangles_y = int(mouse_pos[1] // scale)
     triangles_x = int(mouse_pos[0] // scale)
@@ -227,6 +229,9 @@ while running:
                     triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
                     for i in triangles_i:
                         triangles[triangles_y][triangles_x][i] = selected_colour
+            elif event.button == 2:
+                triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos(), 0)
+                selected_colour = triangles[triangles_y][triangles_x][triangles_i[0]]
             elif event.button == 3: # Right click
                 triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
                 for i in triangles_i:
