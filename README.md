@@ -15,8 +15,9 @@ v1.0:
     - [X] Tkinter-based colour selection window
   - [X] Buttons for canvas reset and zoom control
   - [ ] Position and canvas size display
-- [ ] Efficiency
-  - [ ] Trim blank canvas
+  - [ ] FPS display
+- [X] Efficiency
+  - [X] Trim blank canvas
 - [ ] File operations
   - [X] Custom .tri format
   - [ ] Custom .tri2 format (improved efficiency)
@@ -28,4 +29,5 @@ v1.0:
   - [ ] Tkinter-based settings window
   - [ ] Keyboard controls display
   - [ ] pygame window size control
+  - [ ] FPS target modification
   - [ ] .set file for settings preservation
