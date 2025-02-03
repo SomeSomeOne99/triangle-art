@@ -75,14 +75,12 @@ def draw_squares_icon(screen, position):
     pygame.draw.rect(screen, (0,0,0), (position[0], position[1], 30, 30), width = 1)
 # Button command functions
 def select_colour(i):
-    global selected_colour
-    selected_colour = colour_buttons[i].colour
+    global selected_colour_button
+    selected_colour_button = i
 def set_colour(i):
-    global colour_buttons, selected_colour
+    global colour_buttons
     chosen_colour = colorchooser.askcolor(colour_buttons[i].colour)[0]
     if chosen_colour != None:
-        if colour_buttons[i].colour == selected_colour:
-            selected_colour = chosen_colour
         colour_buttons[i].colour = chosen_colour
 def reset_colours():
     global colour_buttons
@@ -209,7 +207,7 @@ canvas_buttons = tuple([TextButton((33 + 55*i, 45), "Edit", width = 27, height =
 mode_buttons = (IconButton((screen_width - 45, screen_height - 180), 40, 40, draw_quarter_triangles_icon, command = lambda : change_mode(0), icon_offset = (5, 5), value = 0), IconButton((screen_width - 45, screen_height - 135), 40, 40, draw_half_triangles1_icon, command = lambda : change_mode(1), icon_offset = (5, 5), value = 1), IconButton((screen_width - 45, screen_height - 90), 40, 40, draw_half_triangles2_icon, command = lambda : change_mode(2), icon_offset = (5, 5), value = 2), IconButton((screen_width - 45, screen_height - 45), 40, 40, draw_squares_icon, command = lambda : change_mode(3), icon_offset = (5, 5), value = 3))
 position = [0, 0] # Camera position
 show_outlines = True
-selected_colour = (150,150,150)
+selected_colour_button = 1
 button_selected = False
 clearCount = 0
 triangle_mode = 0 # 0 = quarter triangle, 1 = half triangle top-right/bottom-left, 2 = half triangle top-left/bottom-right, 3 = squares
@@ -228,13 +226,10 @@ while running:
                 if not button_selected:
                     triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
                     for i in triangles_i:
-                        triangles[triangles_y][triangles_x][i] = selected_colour
+                        triangles[triangles_y][triangles_x][i] = colour_buttons[selected_colour_button].colour
             elif event.button == 2:
                 triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos(), 0)
-                for i in range(6):
-                    if colour_buttons[i].colour == selected_colour:
-                        colour_buttons[i].colour = triangles[triangles_y][triangles_x][triangles_i[0]]
-                selected_colour = triangles[triangles_y][triangles_x][triangles_i[0]]
+                colour_buttons[selected_colour_button].colour = triangles[triangles_y][triangles_x][triangles_i[0]]
             elif event.button == 3: # Right click
                 triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
                 for i in triangles_i:
@@ -259,7 +254,7 @@ while running:
             triangles_y, triangles_x, triangles_i = position_to_triangle(pygame.mouse.get_pos())
             if pygame.mouse.get_pressed()[0] and not button_selected: # Left click
                 for i in triangles_i:
-                    triangles[triangles_y][triangles_x][i] = selected_colour # Set triangle to same colour as clicked
+                    triangles[triangles_y][triangles_x][i] = colour_buttons[selected_colour_button].colour # Set triangle to same colour as clicked
             elif pygame.mouse.get_pressed()[2]: # Right click
                 for i in triangles_i:
                     triangles[triangles_y][triangles_x][i] = (0,0,0) # Clear triangle
@@ -349,8 +344,8 @@ while running:
                 pygame.draw.polygon(screen, triangles[y][x][2], [(x*scale - position[0], y*scale+scale - position[1]), (x*scale+(scale/2) - position[0], y*scale+(scale/2) - position[1]), (x*scale+scale - position[0], y*scale+scale - position[1])])
             if triangles[y][x][3] != (0,0,0):
                 pygame.draw.polygon(screen, triangles[y][x][3], [(x*scale - position[0], y*scale - position[1]), (x*scale+(scale/2) - position[0], y*scale+(scale/2) - position[1]), (x*scale - position[0], y*scale+scale - position[1])])
-    for colour_button in colour_buttons:
-        colour_button.draw(screen, pygame.mouse.get_pos(), colour_button.colour == selected_colour)
+    for i, colour_button in enumerate(colour_buttons):
+        colour_button.draw(screen, pygame.mouse.get_pos(), i == selected_colour_button)
     for canvas_button in canvas_buttons:
         canvas_button.draw(screen, pygame.mouse.get_pos())
     for mode_button in mode_buttons:
