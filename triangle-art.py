@@ -186,6 +186,7 @@ while running:
             elif pygame.mouse.get_pressed()[2]: # Right click
                 for i in triangles_i:
                     triangles[triangles_y][triangles_x][i] = (0,0,0) # Clear triangle
+    while position[0] < 0 or position[1] < 0 or (position[0] + SCREEN_WIDTH) // scale >= len(triangles[0]) or (position[1] + SCREEN_HEIGHT) // scale >= len(triangles):
         while position[0] < 0: # Add more triangles to the left
             position[0] += scale
             for row in triangles:
