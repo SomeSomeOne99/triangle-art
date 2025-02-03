@@ -141,6 +141,7 @@ position = [0, 0] # Camera position
 show_outlines = True
 selected_colour = (150,150,150)
 button_selected = False
+clearCount = 0
 triangle_mode = 0 # 0 = quarter triangle, 1 = half triangle top-right/bottom-left, 2 = half triangle top-left/bottom-right, 3 = squares
 while running:
     for event in pygame.event.get():
@@ -199,6 +200,59 @@ while running:
                 row.append([(0,0,0), (0,0,0), (0,0,0), (0,0,0)])
         while (position[1] + SCREEN_HEIGHT) // scale >= len(triangles): # Add more triangles to the bottom
             triangles.append([[(0,0,0), (0,0,0), (0,0,0), (0,0,0)] for _ in range(len(triangles[0]))])
+    # Trim blank canvas rows/columns
+    blank = True
+    for y in range(0, int(position[1] // scale)): # Trim rows above camera
+        for x in range(len(triangles[y])):
+            for triangle in triangles[y][x]:
+                if triangle != (0,0,0):
+                    blank = False
+                    break
+            if not blank:
+                break
+        if not blank:
+            break
+        triangles.pop(0) # Clear first row if blank
+        position[1] -= scale
+    blank = True
+    for x in range(0, int(position[0] // scale)): # Trim columns left of camera
+        for y in range(len(triangles)):
+            for triangle in triangles[y][x]:
+                if triangle != (0,0,0):
+                    blank = False
+                    break
+            if not blank:
+                break
+        if not blank:
+            break
+        for y in range(len(triangles)):
+            triangles[y].pop(0) # Clear first column if blank
+        position[0] -= scale
+    blank = True
+    for y in range(len(triangles) - 1, int((position[1] + SCREEN_HEIGHT) // scale), -1): # Trim rows below camera
+        for x in range(len(triangles[y])):
+            for triangle in triangles[y][x]:
+                if triangle != (0,0,0):
+                    blank = False
+                    break
+            if not blank:
+                break
+        if not blank:
+            break
+        triangles.pop(len(triangles) - 1) # Clear last row if blank
+    blank = True
+    for x in range(len(triangles[0]) - 1, int((position[0] + SCREEN_WIDTH) // scale), -1): # Trim columns right of camera
+        for y in range(len(triangles)):
+            for triangle in triangles[y][x]:
+                if triangle != (0,0,0):
+                    blank = False
+                    break
+            if not blank:
+                break
+        if not blank:
+            break
+        for y in range(len(triangles)):
+            triangles[y].pop(len(triangles[y]) - 1) # Clear last column if blank
     screen.fill((0, 0, 0)) # Reset screen
     for y in range(int(position[1] // scale), int((position[1] + SCREEN_HEIGHT) // scale) + 1):
         for x in range(int(position[0] // scale), int((position[0] + SCREEN_WIDTH) // scale) + 1):
